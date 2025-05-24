@@ -53,7 +53,7 @@ const Topbar: React.FC = () => {
     <>
       <div className="flex justify-between items-center bg-gray-100 dark:bg-gray-800 p-4 shadow-sm border-b border-gray-300 dark:border-gray-700">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Welcome, {name}!</h1>
-        <Button variant="ghost" className="text-red-600 dark:text-red-400" onClick={handleLogout}>
+        <Button variant="ghost" className="text-red-600 dark:text-red-400 flex" onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
           Logout
         </Button>

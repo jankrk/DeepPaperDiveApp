@@ -7,13 +7,6 @@ import { useAuth } from "../components/AuthProvider";
 
 
 const Layout = () => {
-    // const { token } = useAuth();
-
-    // // Jeśli nie ma tokena, przekieruj do loginu
-    // if (!token) {
-    //     return <Navigate to="/login" replace />;
-    // }
-
 
     const [sidebarOpen, setSidebarOpen] = useState(true);
 

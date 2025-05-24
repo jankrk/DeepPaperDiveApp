@@ -7,17 +7,12 @@ from app.database import SessionLocal
 from fastapi.security import OAuth2PasswordBearer
 from app.models.user import User
 from app.core.security import verify_token
+from app.database import get_db
 
 router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
     payload = verify_token(token)

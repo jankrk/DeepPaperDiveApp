@@ -12,8 +12,9 @@ class Answer(Base):
     question_id = Column(Integer, ForeignKey("questions.id"))
     status = Column(String, default="pending")  # pending, in_progress, done, error
     answer_text = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    answer_encoded = Column(Text, default="")
+    answer_contexts = Column(Text, default="")
+    answer_conversation = Column(Text, default="")
 
     job = relationship("Job")
     file = relationship("File")

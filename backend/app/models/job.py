@@ -7,6 +7,7 @@ class Job(Base):
     __tablename__ = "jobs"
 
     id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"))
     status = Column(String, default="pending")  # pending, running, done, error
     created_at = Column(DateTime, default=datetime.utcnow)

@@ -11,7 +11,6 @@ class UserLogin(BaseModel):
 
 class UserOut(BaseModel):
     id: int
-    email: EmailStr
     name: str
 
     class Config:
