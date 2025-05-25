@@ -10,12 +10,13 @@ class Answer(Base):
     job_id = Column(Integer, ForeignKey("jobs.id"))
     file_id = Column(Integer, ForeignKey("files.id"))
     question_id = Column(Integer, ForeignKey("questions.id"))
-    status = Column(String, default="pending")  # pending, in_progress, done, error
+    status = Column(String, default="pending")
     answer_text = Column(Text, nullable=True)
     answer_encoded = Column(Text, default="")
     answer_contexts = Column(Text, default="")
     answer_conversation = Column(Text, default="")
 
-    job = relationship("Job")
+    job = relationship("Job", back_populates="answers")
     file = relationship("File")
     question = relationship("Question")
+

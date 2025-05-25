@@ -48,7 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, toggle }) => {
         {open && <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">Jobs</span>}
       </div>
       <div className="p-4 space-y-2">
-        <Button className="w-full" variant="outline" onClick={() => navigate("/new-job")}>
+        <Button className="w-full" variant="outline" onClick={() => navigate("/dashboard")}>
           <Plus className="mr-2 h-4 w-4" />
           {open && "New Job"}
         </Button>

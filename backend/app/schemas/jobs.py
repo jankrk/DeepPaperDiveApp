@@ -9,9 +9,22 @@ class JobOut(BaseModel):
     class Config:
         from_attributes = True
 
+class Question(BaseModel):
+    id: int
+    text: str
+
+class File(BaseModel):
+    id: int
+    filename: str
+
+class Answer(BaseModel):
+    id: int
+    file_id: int
+    question_id: int
 
 class JobDetail(BaseModel):
     id: int
     name: str
-    questions: List[str]
-    filenames: List[str]
+    questions: List[Question]
+    files: List[File]
+    answers: List[Answer]

@@ -15,7 +15,7 @@ export default defineConfig({
     proxy: {
       "/auth": "http://backend:8000",
       '/jobs': 'http://backend:8000',
-      '/answer': 'http://backend:8000',
+      '/answers': 'http://backend:8000',
     },
   },
 });

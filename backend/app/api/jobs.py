@@ -17,7 +17,6 @@ def list_user_jobs(current_user: User = Depends(get_current_user), db: Session =
 
 @router.get("/{job_id}", response_model=JobDetail)
 def get_job_detail(job_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    print(job_id)
     return get_job_detail_by_id(db, current_user, job_id)
 
 @router.post("")

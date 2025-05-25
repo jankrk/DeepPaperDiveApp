@@ -60,8 +60,9 @@ const JobCreate: React.FC = () => {
 
       if (res.ok) {
         const data = await res.json();
-        // console.log(data);
-        navigate("/dashboard/job/data.id")
+        console.log("submit res")
+        console.log(data);
+        navigate(`/dashboard/job/${data.id}`)
       } else {
         console.error("Server error:", res.status);
       }

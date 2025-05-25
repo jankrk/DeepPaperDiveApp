@@ -4,17 +4,26 @@ from app.models.user import User
 from app.models.job import Job
 
 
-def get_answer_text(db: Session, user: User, question_id: int, file_id: int) -> str:
+def get_answer_text(db: Session, user: User, answer_id: int):
     answer = db.query(Answer).join(Job).filter(
-        Answer.question_id == question_id,
-        Answer.file_id == file_id,
+        Answer.id == answer_id,
         Job.user_id == user.id
     ).first()
 
     if not answer:
-        return "brak odpowiedzi"
+        return {
+            "answer_text": "db error", 
+            "status": "error"
+        }
 
     if answer.status == "done" and answer.answer_text:
-        return answer.answer_text
+        return {
+            "answer_text": answer.answer_text, 
+            "status": answer.status
+        }
+    
 
-    return "brak odpowiedzi"
+    return {
+            "answer_text": "", 
+            "status": answer.status
+        }

@@ -1,98 +1,73 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useAuth } from "../components/AuthProvider";
+import QuestionHeader from "../components/QuestionHeader";
+import AnswerCell from "../components/AnswerCell";
+import FileCell from "../components/FileCell"; 
+
+interface Question { id: number; text: string; }
+interface File { id: number; filename: string; }
+interface Answer { id: number; file_id: number; question_id: number; }
 
 const JobDetails = () => {
-  const { id } = useParams();
-  const [jobName, setJobName] = useState("");
-  const [questions, setQuestions] = useState<string[]>([]);
-  const [files, setFiles] = useState<{ id: number; filename: string }[]>([]);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [stopped, setStopped] = useState(false);
+  const { id } = useParams<{ id: string }>();
   const auth = useAuth();
-  
+
+  const [jobName, setJobName] = useState("");
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
+  const [answersMeta, setAnswersMeta] = useState<Answer[]>([]);
 
   useEffect(() => {
     fetch(`/jobs/${id}`, {
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        }})
-      .then((res) => res.json())
-      .then((data) => {
+      headers: { Authorization: `Bearer ${auth.token}` },
+    })
+      .then(res => res.json())
+      .then(data => {
         console.log(data)
         setJobName(data.name);
         setQuestions(data.questions);
         setFiles(data.files);
-        setStopped(data.stopped);
+        setAnswersMeta(data.answers);
       });
-  }, [id]);
-  
-
-  const fetchAnswer = async (questionId: number, fileId: number) => {
-    const key = `${questionId}_${fileId}`;
-    if (answers[key]) return;
-    setAnswers((prev) => ({ ...prev, [key]: "loading" }));
-    const res = await fetch(`/api/answer?question_id=${questionId}&file_id=${fileId}`);
-    const data = await res.json();
-    setAnswers((prev) => ({ ...prev, [key]: data.text || "brak odpowiedzi" }));
-  };
-
-  const stopJob = async () => {
-    await fetch(`/api/job/${id}/stop`, { method: "POST" });
-    setStopped(true);
-  };
+  }, [id, auth.token]);
 
   return (
-    <div className="w-full h-screen overflow-auto">
-      <div className="p-4 flex justify-between items-center bg-white shadow sticky top-0 z-10">
-        <h1 className="text-2xl font-semibold">{jobName}</h1>
-        {!stopped && (
-          <button onClick={stopJob} className="px-4 py-2 bg-red-600 text-white rounded">STOP</button>
-        )}
-      </div>
-      <div className="overflow-auto">
-        <table className="min-w-max border-collapse">
-          <thead>
-            <tr>
-              <th className="sticky left-0 bg-white z-10 p-2 border">Plik / Pytanie</th>
-              {questions.map((q, i) => (
-                <th key={i} className="bg-white p-2 border text-left">{q}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {files.map((file) => (
-              <tr key={file.id}>
-                <td className="sticky left-0 bg-white z-10 p-2 border whitespace-nowrap">
-                  <a
-                    href={`/job_files/${id}/${file.filename}`}
-                    download
-                    className="text-blue-600 underline"
-                  >
-                    {file.filename}
-                  </a>
-                </td>
-                {questions.map((_, qi) => {
-                  const qId = qi + 1; // assuming question_id is index + 1
-                  const key = `${qId}_${file.id}`;
-                  const value = answers[key];
-                  useEffect(() => {
-                    fetchAnswer(qId, file.id);
-                  }, []);
-                  return (
-                    <td key={key} className="p-2 border text-sm w-48 h-24 align-top">
-                      {value === "loading" ? (
-                        <div className="animate-pulse text-gray-400">Loading...</div>
-                      ) : (
-                        value || ""
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="p-4 w-full h-screen overflow-auto">
+      <h1 className="text-2xl font-bold mb-4">{jobName}</h1>
+
+      <div
+        className="grid"
+        style={{
+          gridTemplateColumns: `minmax(150px, auto) repeat(${questions.length}, minmax(120px, 1fr))`,
+          gridAutoRows: "minmax(40px, auto)",
+        }}
+      >
+        {/* PUSTY LEWY GÓRNY RÓG */}
+        <div className="border bg-gray-100" />
+
+        {/* Nagłówki pytań */}
+        {questions.map((q) => (
+          <QuestionHeader key={q.id} question={q} />
+        ))}
+
+        {/* Wiersze: nazwy plików + komórki z odpowiedziami */}
+        {files.map((file) => (
+          <React.Fragment key={file.id}>
+            <FileCell file={file} />
+            {questions.map((q) => {
+              const answerMeta = answersMeta.find(
+                (a) => a.question_id === q.id && a.file_id === file.id
+              );
+              return (
+                <AnswerCell
+                  key={`${file.id}_${q.id}`}
+                  answerMeta={answerMeta}
+                />
+              );
+            })}
+          </React.Fragment>
+        ))}
       </div>
     </div>
   );
