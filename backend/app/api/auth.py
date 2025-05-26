@@ -3,11 +3,10 @@ from sqlalchemy.orm import Session
 from app.schemas.user import UserCreate, UserLogin, UserOut
 from app.services.user_service import create_user, get_user_by_email
 from app.core.security import verify_password, create_access_token
-from app.database import SessionLocal
 from fastapi.security import OAuth2PasswordBearer
-from app.models.user import User
+from database.models.user import User
 from app.core.security import verify_token
-from app.database import get_db
+from database.database import get_db
 
 router = APIRouter()
 

@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, s
 from typing import List
 from sqlalchemy.orm import Session
 from app.schemas.jobs import JobOut, JobDetail
-from app.models.user import User
-from app.models.job import Job
+from database.models.user import User
+from database.models.job import Job
 from app.services.jobs_service import get_job_detail_by_id, get_user_jobs, create_job_with_files, stop_job_by_id
-from app.database import get_db
+from database.database import get_db
 from app.api.auth import get_current_user
 
 router = APIRouter()

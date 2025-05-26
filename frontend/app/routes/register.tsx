@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../components/AuthProvider";
 
@@ -9,6 +9,12 @@ export default function Register() {
   const [error, setError] = useState<string | null>(null);
   const auth = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [auth.isAuthenticated]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,8 +44,7 @@ export default function Register() {
       }
 
       const loginData = await loginRes.json();
-      auth.login(loginData.access_token);
-      navigate("/dashboard");
+      auth.login(loginData.access_token, loginData.user);
     } catch (err: any) {
       setError(err.message);
     }

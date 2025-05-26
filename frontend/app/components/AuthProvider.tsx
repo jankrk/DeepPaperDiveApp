@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 export type AuthContextType = {
   user: string | null;
   token: string | null;
-  login: (token: string, user?: string) => void;
+  login: (token: string, user: string) => void;
   logout: () => void;
   isAuthenticated: boolean;
 };
@@ -21,7 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (storedUser) setUser(storedUser);
   }, []);
 
-  const login = (newToken: string, newUser?: string) => {
+  const login = (newToken: string, newUser: string) => {
     setToken(newToken);
     if (newUser) setUser(newUser);
     localStorage.setItem("token", newToken);

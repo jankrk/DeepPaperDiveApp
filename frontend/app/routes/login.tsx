@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../components/AuthProvider";
 
@@ -8,6 +8,12 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const auth = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [auth.isAuthenticated]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -20,14 +26,15 @@ export default function Login() {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
+      const data = await res.json();
+
+      if (res.ok) {
+        auth.login(data.access_token, data.user);
+      } else {
         throw new Error(data.detail || "Login failed");
       }
 
-      const data = await res.json();
-      auth.login(data.access_token);
-      navigate("/dashboard");
+      
     } catch (err: any) {
       setError(err.message);
     }

@@ -2,10 +2,13 @@ fastapi
 uvicorn
 sqlalchemy
 pydantic
-passlib[bcrypt]
 python-jose
 python-multipart
 aiofiles
 celery[redis]
 redis
 pydantic[email]
+python-dotenv
+psycopg2-binary
+argon2-cffi
+

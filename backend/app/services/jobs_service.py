@@ -1,15 +1,16 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from app.models.job import Job
-from app.models.file import File
-from app.models.question import Question
-from app.models.user import User
-from app.models.answer import Answer
+from database.models.job import Job
+from database.models.file import File
+from database.models.question import Question
+from database.models.user import User
+from database.models.answer import Answer
 from typing import List
 from fastapi import UploadFile
 import os
 from uuid import uuid4
 from datetime import datetime
+from app.tasks.process_job import process_job
 
 UPLOAD_DIR = "jobs_files"
 
@@ -93,6 +94,7 @@ def create_job_with_files(db: Session, user: User, name: str, questions: List[st
 
     db.commit()
     db.refresh(job)
+    process_job.delay(job.id)
     return job
 
 

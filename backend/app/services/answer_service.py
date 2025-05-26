@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-from app.models.answer import Answer
-from app.models.user import User
-from app.models.job import Job
+from database.models.answer import Answer
+from database.models.user import User
+from database.models.job import Job
 
 
 def get_answer_text(db: Session, user: User, answer_id: int):

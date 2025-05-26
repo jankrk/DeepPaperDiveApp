@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
-from passlib.context import CryptContext
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 from app.core.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
+ph = PasswordHasher()
 
 def verify_token(token: str) -> dict | None:
     try:
@@ -12,12 +12,15 @@ def verify_token(token: str) -> dict | None:
         return payload
     except JWTError:
         return None
-    
-def verify_password(plain, hashed):
-    return pwd_context.verify(plain, hashed)
 
-def hash_password(password):
-    return pwd_context.hash(password)
+def verify_password(plain: str, hashed: str) -> bool:
+    try:
+        return ph.verify(hashed, plain)
+    except VerifyMismatchError:
+        return False
+
+def hash_password(password: str) -> str:
+    return ph.hash(password)
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
