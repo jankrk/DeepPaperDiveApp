@@ -28,3 +28,6 @@ class JobDetail(BaseModel):
     questions: List[Question]
     files: List[File]
     answers: List[Answer]
+
+class JobStatus(BaseModel):
+    status: str

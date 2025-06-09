@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
-from datetime import datetime
 from database.database import Base
 
 class Question(Base):
@@ -8,6 +8,7 @@ class Question(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     job_id = Column(Integer, ForeignKey("jobs.id"))
-    text = Column(String)
+    text = Column(Text)
+    possible_options = Column(Text, default="")
 
     job = relationship("Job", back_populates="questions")

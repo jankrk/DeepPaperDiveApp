@@ -1,5 +1,8 @@
-test.db
-job_files/
+backend/jobs_files/*
+
+!backend/jobs_files/demo/
+
+!backend/jobs_files/demo/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

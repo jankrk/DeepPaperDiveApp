@@ -8,22 +8,22 @@ from database.models.answer import Answer
 from typing import List
 from fastapi import UploadFile
 import os
+import json
 from uuid import uuid4
 from datetime import datetime
 from app.tasks.process_job import process_job
 
-UPLOAD_DIR = "jobs_files"
+JOB_FILES_DIR = "/app/jobs_files"
 
 
 def get_user_jobs(db: Session, user: User):
     jobs = db.query(Job.id, Job.name).filter(Job.user_id == user.id).order_by(Job.created_at.desc()).all()
     if not jobs:
-        return []  # lub logika np. logger.info("No jobs for user %s", user.id)
+        return []
     return jobs
 
-
-def get_job_detail_by_id(db: Session, user: User, job_id: int):
-    job = db.query(Job).filter(Job.id == job_id, Job.user_id == user.id).first()
+def get_job_detail_demo(db: Session, job_id: int):
+    job = db.query(Job).filter(Job.id == job_id).first()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
 
@@ -49,20 +49,52 @@ def get_job_detail_by_id(db: Session, user: User, job_id: int):
     ]
 }
 
+def get_job_detail_by_id(db: Session, user: User, job_id: int):
+    job = db.query(Job).filter(Job.id == job_id, Job.user_id == user.id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    return {
+        "id": job.id,
+        "name": job.name,
+        "questions": [
+            {
+                "id": q.id, 
+                "text": q.text
+            } for q in job.questions],
+        "files": [
+            {
+                "id": f.id, 
+                "filename": f.filename
+                } for f in job.files],
+        "answers": [
+            {
+                "id": a.id,
+                "question_id": a.question_id,
+                "file_id": a.file_id
+            } for a in job.answers
+        ]
+    }
+
+def get_status_job_by_id(db: Session, user: User, job_id: int):
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return {"status": job.status}
+
 def create_job_with_files(db: Session, user: User, name: str, questions: List[str], files: List[UploadFile]):
     job = Job(name=name, user_id=user.id, status="pending")
     db.add(job)
-    db.flush()  # to get job.id
+    db.flush()
 
-    # Save questions
     db_questions = []
     for text in questions:
-        db_question = Question(job_id=job.id, text=text)
+        question = json.loads(text)
+        db_question = Question(job_id=job.id, text=question["text"], possible_options=question["possible_options"] )
         db.add(db_question)
         db_questions.append(db_question)
 
-    # Save files
-    file_dir = os.path.join(UPLOAD_DIR, str(job.id))
+    file_dir = os.path.join(JOB_FILES_DIR, str(job.id), "input")
     os.makedirs(file_dir, exist_ok=True)
 
     db_files = []
@@ -79,9 +111,8 @@ def create_job_with_files(db: Session, user: User, name: str, questions: List[st
         db.add(db_file)
         db_files.append(db_file)
 
-    db.flush()  # to get file/question IDs
+    db.flush()  
 
-    # Create empty answers for each question-file pair
     for question in db_questions:
         for db_file in db_files:
             db_answer = Answer(

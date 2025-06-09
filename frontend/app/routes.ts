@@ -4,7 +4,7 @@ export default [
   index("routes/login.tsx"),
   route("register", "routes/register.tsx"),
 
-  route("dashboard", "routes/layout.tsx", [
+  route("dashboard", "routes/dashboard.tsx", [
     index("routes/jobCreate.tsx"),
     route("job/:id", "routes/jobDetails.tsx"),
   ]),

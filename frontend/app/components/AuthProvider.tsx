@@ -21,11 +21,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (storedUser) setUser(storedUser);
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetch("/auth/refresh", { method: "POST", credentials: "include" })
+        .then((res) => res.ok && res.json())
+        .then((data) => {
+          if (data?.access_token) {
+            setToken(data.access_token);
+            localStorage.setItem("token", data.access_token);
+          }
+        })
+        .catch(() => {});
+    }, 5 * 60 * 1000); // co 5 minut
+
+    return () => clearInterval(interval);
+  }, []);
+
   const login = (newToken: string, newUser: string) => {
     setToken(newToken);
-    if (newUser) setUser(newUser);
+    setUser(newUser);
     localStorage.setItem("token", newToken);
-    if (newUser) localStorage.setItem("user", newUser);
+    localStorage.setItem("user", newUser);
   };
 
   const logout = () => {
@@ -33,6 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    // fetch("/auth/logout", { method: "POST", credentials: "include" });
   };
 
   const isAuthenticated = !!token;

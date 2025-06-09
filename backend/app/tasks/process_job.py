@@ -1,7 +1,9 @@
 from app.core.celery_app import celery_app
 from database.database import SessionLocal
-from database.models import Job, Answer
+from database.models import Job, Answer, Question
+from mies_rag.main import main as miesRAG
 import time
+
 
 @celery_app.task(name="app.tasks.process_job.process_job")
 def process_job(job_id: int):
@@ -12,15 +14,17 @@ def process_job(job_id: int):
         return f"Job {job_id} not found"
 
     job.status = "processing"
-    db.commit()
-
-    answers = db.query(Answer).filter(Answer.job_id == job_id).all()
-    for answer in answers:
-        time.sleep(3)  # symulacja
-        answer.status = "done"
-        answer.answer_text = "Przetworzono"
-        db.commit()
+    questions = db.query(Question).filter(Question.job_id == job_id).all()
+    quesries = []
+    for q in questions:
+        quesries.append(
+            {
+                "topic": q.text,
+                "possible_options": q.possible_options
+            }
+        )
+    miesRAG(db, job_id, quesries)
     job.status = "done"
     db.commit()
-    db.close()
+
     return f"Processed job {job_id}"

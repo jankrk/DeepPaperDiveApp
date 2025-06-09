@@ -8,7 +8,7 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
-    raise RuntimeError("Brak zmiennej DATABASE_URL w pliku .env")
+    raise RuntimeError("Missing DATABASE_URL variable in the .env file")
 
 engine = create_engine(DATABASE_URL)
 

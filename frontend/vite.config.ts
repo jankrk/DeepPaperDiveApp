@@ -16,25 +16,7 @@ export default defineConfig({
       "/auth": "http://backend:8000",
       '/jobs': 'http://backend:8000',
       '/answers': 'http://backend:8000',
+      '/files': 'http://backend:8000',
     },
   },
 });
-
-// import { reactRouter } from "@react-router/dev/vite";
-// import tailwindcss from "@tailwindcss/vite";
-// import { defineConfig } from "vite";
-// import tsconfigPaths from "vite-tsconfig-paths";
-
-// export default defineConfig({
-//   plugins: [
-//     tailwindcss(),
-//     reactRouter(),
-//     tsconfigPaths(),
-//   ],
-//   server: {
-//     proxy: {
-//       "/auth": "http://localhost:8000",
-//       // inne endpointy backendu też możesz przekierować, np. "/api": "http://localhost:8000",
-//     },
-//   },
-// });
