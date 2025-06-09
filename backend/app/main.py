@@ -11,7 +11,9 @@ from app.api.auth import router as auth_router
 from app.api.jobs import router as jobs_router
 from app.api.answer import router as answers_router
 from app.api.files import router as files_router
+from dotenv import load_dotenv
 
+load_dotenv()
 
 def wait_for_db(retries=10, delay=3):
     from sqlalchemy import create_engine

@@ -13,38 +13,26 @@ from mies_rag.config.config import (
     RAGAS,
     G_EVAL,
 )
-from mies_rag.config.config_keys import (
-    OPENAI_API_KEY, 
-    LLAMA_PARSE_API_KEY, 
-)
 
 from mies_rag.utils.QuestionsManager import QuestionsManager
-from mies_rag.utils.ReportGenerator import ReportGenerator
 from mies_rag.utils.VectorQueryEngineCreator import VectorQueryEngineCreator
 from mies_rag.utils.RAGEvaluator import RAGEvaluator
 from mies_rag.workflow.MultiStepQueryEngineWorkflow import MultiStepQueryEngineWorkflow
 
 from sqlalchemy import and_
 from database.models import Answer, Question, File
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def main(db, job_id, queries):
     INPUT_PATH = os.path.join("/app/jobs_files", str(job_id), "input")
-    
-    # OUTPUT_PATH = os.path.join("/app/jobs_files", str(job_id), "output")
-    # STORAGE_PATH = os.path.join("/app/jobs_files", str(job_id), "storage")
-    # os.makedirs(OUTPUT_PATH, exist_ok=True)
-    # os.makedirs(STORAGE_PATH, exist_ok=True)
-
     start = time.time()
     nest_asyncio.apply()
-    os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+    os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
     llm = OpenAI(model=MODEL)
     Settings.llm = llm
     
-    
-    # questionsManager = QuestionsManager(queries, STORAGE_PATH, Settings.llm)
-    # raportGenerator = ReportGenerator(queries, OUTPUT_PATH)
-
     questionsManager = QuestionsManager(queries, Settings.llm)
 
     files = os.listdir(INPUT_PATH)
@@ -56,17 +44,12 @@ def main(db, job_id, queries):
 
     for i, file in enumerate(pdf_files):
         
-        # query_engine = VectorQueryEngineCreator(LLAMA_PARSE_API_KEY, MODEL, INPUT_PATH, STORAGE_PATH).get_query_engine(file)
-        query_engine = VectorQueryEngineCreator(LLAMA_PARSE_API_KEY, MODEL, INPUT_PATH).get_query_engine(file)
+        query_engine = VectorQueryEngineCreator(MODEL, INPUT_PATH).get_query_engine(file)
         workflow = MultiStepQueryEngineWorkflow(timeout=10000)
         result = asyncio.run(process_file(db, job_id, f"[{i+1}/{len(pdf_files)}]", file, workflow, questionsManager, Settings.llm, query_engine))
-        info = {} # todo: get info from the pdf file (author, title, etc.)
-        # raportGenerator.generate_partial_report(file, info, result)
         
-    # raportGenerator.generate_main_report()
     end = time.time()
     execution_time = end - start
-    # raportGenerator.generate_config_report(execution_time)
     
     print("END")
     print(f"Execution time: {execution_time} seconds")

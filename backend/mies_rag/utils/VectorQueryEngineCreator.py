@@ -8,15 +8,13 @@ from llama_index.core.query_engine import RetrieverQueryEngine
 
 
 class VectorQueryEngineCreator:
-    def __init__(self, llama_parse_api_key, model, input_path):
-        self.llama_parse_api_key = llama_parse_api_key
+    def __init__(self, model, input_path):
         self.model = model
         self.input_path = input_path
-        # self.storage_path = storage_path
 
     def parse_pdf_to_nodes(self, path_to_pdf):
         documents = LlamaParse(
-            api_key=self.llama_parse_api_key,
+            api_key=os.getenv("LLAMA_PARSE_API_KEY"),
             result_type="markdown"
         ).load_data(path_to_pdf)
         node_parser = MarkdownElementNodeParser(
@@ -49,17 +47,6 @@ class VectorQueryEngineCreator:
         return query_engine
 
     def get_query_engine(self, file):
-        # vector_index_persist_path = f'{self.storage_path}/{file}_vector_index/'
-
-        # if os.path.exists(vector_index_persist_path):
-        #     storage_context = StorageContext.from_defaults(persist_dir=vector_index_persist_path)
-        #     vector_index = load_index_from_storage(storage_context)
-        # else:
-        #     pdf_path = os.path.join(self.input_path, f"{file}.pdf")
-        #     documents, node_parser, nodes = self.parse_pdf_to_nodes(pdf_path)
-        #     vector_index = self.create_vector_index(documents, node_parser, nodes)
-            # vector_index.storage_context.persist(vector_index_persist_path)
-        
         pdf_path = os.path.join(self.input_path, f"{file}.pdf")
         documents, node_parser, nodes = self.parse_pdf_to_nodes(pdf_path)
         vector_index = self.create_vector_index(documents, node_parser, nodes)
