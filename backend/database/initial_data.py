@@ -9,7 +9,7 @@ from database.models.answer import Answer
 from database.data_demo.questions import QUESTIONS
 from database.data_demo.files import FILES
 from database.data_demo.ansewers import ANSWERS
-
+import os
 
 def reset_sequence(db, table_name, id_column):
     db.execute(text(f"""
@@ -23,8 +23,7 @@ def reset_sequence(db, table_name, id_column):
 
 def create_default_users(db):
     users = [
-        {"id": 1, "email": "admin@example.com", "name": "Admin", "password": "adminpass"},
-        {"id": 2, "email": "test@example.com", "name": "Test", "password": "testpass"},
+        {"id": 1, "email": "admin@example.com", "name": "Admin", "password": os.getenv("FRONTEND_ADMIN_PASSWORD")},
     ]
 
     for user_data in users:

@@ -4,8 +4,8 @@ import { useAuth } from "../components/AuthProvider";
 import { useApi } from "../hooks/useApi";
 
 export default function Login() {
-  const [email, setEmail] = useState("test@example.com");
-  const [password, setPassword] = useState("testpass");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const auth = useAuth();
   const apiFetch = useApi();
